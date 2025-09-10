@@ -10,9 +10,9 @@ const Header = () => {
       <ul className={styles.navs}>
         {navs.map(item => <li key={item.patn} onClick={() => navigate(item.path)}><Typography text={item.name} name='caption2' /></li>)}
       </ul>
-      <div>
+      {/* <div>
         icons
-      </div>
+      </div> */}
     </header>
   )
 }

@@ -1,73 +1,79 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMemo } from "react"
+import styles from './Gallery.module.scss'
+import Carousel from "../../components/Carousel"
+import Typography from "../../components/ui"
+import { useGroupImage } from "../../hooks/useGroupImage"
+import CarouselSkeleton from "../../components/Carousel/CarouselSkeleton"
+import { useNavigate } from "react-router"
+import { useFetchImage } from "../../hooks/uaeFetchImage"
 
-const fetchGallery = async () => {
-  const res = await fetch('http://localhost:3000/api/gallery')
-  if (!res.ok) {
-    const text = await res.text().catch(() => null)
-    throw new Error(`Failed to fetch gallery: ${res.status} ${res.statusText}${text ? ' — ' + text : ''}`)
-  }
-  return res.json()
-}
 
 const Gallery = () => {
-  const { data: gallery, isLoading, isError, error } = useQuery({
-    queryKey: ['gallery'],
-    queryFn: fetchGallery,
-    staleTime: 1000 * 60 * 5,
-    cacheTime: 1000 * 60 * 30,
-    refetchOnWindowFocus: false,
-  })
+ 
+  const navigate = useNavigate()
+  const {data, isLoading, isFetching, isPending, error} = useFetchImage()
 
-  if (isLoading) return <main>Загрузка...</main>
-  if (isError) return <main>Ошибка: {error?.message ?? 'Unknown'}</main>
+  const grouped = useGroupImage(data ?? [])
+  const placeholderAliases = ["section-1", "section-2", "section-3"]
+  const shouldShowSkeleton = isLoading || isFetching || isPending || (Array.isArray(data) && data.length === 0)
+  const hasEntries = grouped.some(({ items }) => Array.isArray(items) && items.length > 0)
+
+  const pathSegments = useMemo(() => location.pathname.split("/").filter(Boolean), [location.pathname])
+  console.log(pathSegments)
+  if (error) return <div>Ошибка: {error?.message}</div>
+
+  if (window.location.pathname.includes('znaki')) {
+    return (
+      <main className={styles.root}>
+        {data.filter(item => item.alias === 'znaki').map((item => <img src={item.link} width={200} height={200}/>))}
+      </main>
+    )
+  }
+
+  if (window.location.pathname.includes('poetry')) {
+    return (
+      <main>
+        {data.filter(item => item.alias === 'poetry').map((item => <img src={item.link} width={200} height={200}/>))}
+      </main>
+    )
+  }
+
+  if (window.location.pathname.includes('free')) {
+    return (
+      <main>
+        {data.filter(item => item.alias === 'free').map((item => <img src={item.link} width={200} height={200}/>))}
+      </main>
+    )
+  }
 
   return (
-    <main>
-      Gallery
-      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-        {gallery.map(item => (
-          <div key={item.id ?? item.link} style={{ width: 200, height: 200, background: '#eee' }}>
-            <img
-              src={item.link}
-              alt={item.name ?? 'image'}
-              width={200}
-              height={200}
-              loading="lazy"
-              style={{ display: 'block', objectFit: 'cover' }}
-            />
-          </div>
-        ))}
+    <main className={styles.root}>
+      <div className={styles.container}>
+        { shouldShowSkeleton || !hasEntries ? (
+          placeholderAliases.map((alias) => (
+            <CarouselSkeleton key={alias} count={3} />
+          ))
+        ) : (
+          grouped.map(({ alias, rus, items }) => (
+            <section key={alias} style={{ minWidth: 260 }}>
+              <Typography name='title3' text={rus} />
+              <Carousel entries={items} />
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                <div>
+                  <button
+                    style={{ padding: "6px 10px", cursor: "pointer" }}
+                    onClick={() => navigate(`${encodeURIComponent(alias)}`)}
+                  >
+                    Показать все
+                  </button>
+                </div>
+              </div>
+            </section>
+          ))
+        )}
       </div>
     </main>
   )
 }
 
 export default Gallery
-
-
-
-/**
-('изображение 11', 'описание изображения 2', 'https://s1015sas.storage.yandex.net/rdisk/3b50b4f14c74149340fbed3d8ba764b0a9b790b14639cc823967a2e833e037e3/68be04f2/g3mGS569L3NQndLWXmyBWLhUSA8zTBerKb4Cz9cAzgHCs_7eIvswqDCuUXk0oZdsV2KIGAJjRgJpgcrn6XVTnw==?uid=777910961&filename=Вечерний%20проспект.%202024.%20Холст%2C%20масло.%2080%20х%20130%20см.%20.jpg&disposition=inline&hash=&limit=0&content_type=image%2Fjpeg&owner_uid=777910961&fsize=1098413&hid=8b8ff09987b90209bed34ae788ffbd8d&media_type=image&tknv=v3&etag=e348feb1749f7999a6dd6d191c10a555&ts=63e3d76f5a080&s=5afa94e0f4245636e74b96d462cf7fd559a7a6946725946c6118c87457fdd3ec&pb=U2FsdGVkX18zIB7LsotROMNNZlxiy-LRxYPZa4DaynPaKYjO6X3lzY31l7jdlnKPZ1fi9wD24Jouo3iGnS2jk92jBEF5I4zotXe4T3mNEaY'),
-('изображение 12', 'описание изображения 3', 'https://s996sas.storage.yandex.net/rdisk/b0610f1976653b4df3d23999bec384583593d3e9bccaf3a82f5f605188a4ed3d/68be0506/g3mGS569L3NQndLWXmyBWDbeE3sFkxmUmsm7sE9HtJQ7YSwPogqBRDTRA-kDPwGY_gE0KWWt5Qurw1g547GlBw==?uid=777910961&filename=Конец%20октября.%202024.Холст%2C%20масло.%2080х130см.jpg&disposition=inline&hash=&limit=0&content_type=image%2Fjpeg&owner_uid=777910961&fsize=848307&hid=d9ffe5b9a92b356aeb2ffdf00c3aee04&media_type=image&tknv=v3&etag=0d45e3f07cce76c438d41a6094efd1d9&ts=63e3d7826cd80&s=f8164ad740d19d519a395e2944e108eb6430ce6e27abcda70989432a8e1421b0&pb=U2FsdGVkX1_Bss7T2FWGe7sEKpirhQ1POTyigxofA9rP3AQ-ioUeB8fJbKjk94lp1hdD1Uw7UHAHuePNHyTgQz_ulgi0Mot6pF81-tJ2J1s'),
-('изображение 13', 'описание изображения 1', 'https://s287vla.storage.yandex.net/rdisk/89c04cb3db2b728ad1c1213f47ac8ac7fea34f2c0985f7cdf7861fda24ed30d9/68be047e/g3mGS569L3NQndLWXmyBWJuolrjUnNg_71lzo-sP7wZQuTy_prUGB4YPTbAUBruOMGnPBdFxakD2jMDiVi0WUw==?uid=777910961&filename=Весна.-2024.-Холст_-масло.-13-х-80-см_1%20%281%29.webp&disposition=inline&hash=&limit=0&content_type=image%2Fwebp&owner_uid=777910961&fsize=269238&hid=76298eef7121bba0a6c4e6f2ef68e534&media_type=image&tknv=v3&etag=6df93c5f71b36db921042b131c25c1e2&ts=63e3d700b9b80&s=d94eb6edb2fa657662da66e55c84a2b376dd5467c4f1b8a7bb399ee6d368a60c&pb=U2FsdGVkX1_Y-VePhSj8EwPbdnyOL0fhlc9lz-1R3q2voQrgGIhv400be-M4OdKF2KNHGRpRBUN8pISj2Mw-s304OkZcD7i4gIknFfiXP-0'),
-('изображение 14', 'описание изображения 2', 'https://s1015sas.storage.yandex.net/rdisk/3b50b4f14c74149340fbed3d8ba764b0a9b790b14639cc823967a2e833e037e3/68be04f2/g3mGS569L3NQndLWXmyBWLhUSA8zTBerKb4Cz9cAzgHCs_7eIvswqDCuUXk0oZdsV2KIGAJjRgJpgcrn6XVTnw==?uid=777910961&filename=Вечерний%20проспект.%202024.%20Холст%2C%20масло.%2080%20х%20130%20см.%20.jpg&disposition=inline&hash=&limit=0&content_type=image%2Fjpeg&owner_uid=777910961&fsize=1098413&hid=8b8ff09987b90209bed34ae788ffbd8d&media_type=image&tknv=v3&etag=e348feb1749f7999a6dd6d191c10a555&ts=63e3d76f5a080&s=5afa94e0f4245636e74b96d462cf7fd559a7a6946725946c6118c87457fdd3ec&pb=U2FsdGVkX18zIB7LsotROMNNZlxiy-LRxYPZa4DaynPaKYjO6X3lzY31l7jdlnKPZ1fi9wD24Jouo3iGnS2jk92jBEF5I4zotXe4T3mNEaY'),
-('изображение 15', 'описание изображения 3', 'https://s996sas.storage.yandex.net/rdisk/b0610f1976653b4df3d23999bec384583593d3e9bccaf3a82f5f605188a4ed3d/68be0506/g3mGS569L3NQndLWXmyBWDbeE3sFkxmUmsm7sE9HtJQ7YSwPogqBRDTRA-kDPwGY_gE0KWWt5Qurw1g547GlBw==?uid=777910961&filename=Конец%20октября.%202024.Холст%2C%20масло.%2080х130см.jpg&disposition=inline&hash=&limit=0&content_type=image%2Fjpeg&owner_uid=777910961&fsize=848307&hid=d9ffe5b9a92b356aeb2ffdf00c3aee04&media_type=image&tknv=v3&etag=0d45e3f07cce76c438d41a6094efd1d9&ts=63e3d7826cd80&s=f8164ad740d19d519a395e2944e108eb6430ce6e27abcda70989432a8e1421b0&pb=U2FsdGVkX1_Bss7T2FWGe7sEKpirhQ1POTyigxofA9rP3AQ-ioUeB8fJbKjk94lp1hdD1Uw7UHAHuePNHyTgQz_ulgi0Mot6pF81-tJ2J1s'),
-('изображение 16', 'описание изображения 1', 'https://s287vla.storage.yandex.net/rdisk/89c04cb3db2b728ad1c1213f47ac8ac7fea34f2c0985f7cdf7861fda24ed30d9/68be047e/g3mGS569L3NQndLWXmyBWJuolrjUnNg_71lzo-sP7wZQuTy_prUGB4YPTbAUBruOMGnPBdFxakD2jMDiVi0WUw==?uid=777910961&filename=Весна.-2024.-Холст_-масло.-13-х-80-см_1%20%281%29.webp&disposition=inline&hash=&limit=0&content_type=image%2Fwebp&owner_uid=777910961&fsize=269238&hid=76298eef7121bba0a6c4e6f2ef68e534&media_type=image&tknv=v3&etag=6df93c5f71b36db921042b131c25c1e2&ts=63e3d700b9b80&s=d94eb6edb2fa657662da66e55c84a2b376dd5467c4f1b8a7bb399ee6d368a60c&pb=U2FsdGVkX1_Y-VePhSj8EwPbdnyOL0fhlc9lz-1R3q2voQrgGIhv400be-M4OdKF2KNHGRpRBUN8pISj2Mw-s304OkZcD7i4gIknFfiXP-0'),
-('изображение 17', 'описание изображения 2', 'https://s1015sas.storage.yandex.net/rdisk/3b50b4f14c74149340fbed3d8ba764b0a9b790b14639cc823967a2e833e037e3/68be04f2/g3mGS569L3NQndLWXmyBWLhUSA8zTBerKb4Cz9cAzgHCs_7eIvswqDCuUXk0oZdsV2KIGAJjRgJpgcrn6XVTnw==?uid=777910961&filename=Вечерний%20проспект.%202024.%20Холст%2C%20масло.%2080%20х%20130%20см.%20.jpg&disposition=inline&hash=&limit=0&content_type=image%2Fjpeg&owner_uid=777910961&fsize=1098413&hid=8b8ff09987b90209bed34ae788ffbd8d&media_type=image&tknv=v3&etag=e348feb1749f7999a6dd6d191c10a555&ts=63e3d76f5a080&s=5afa94e0f4245636e74b96d462cf7fd559a7a6946725946c6118c87457fdd3ec&pb=U2FsdGVkX18zIB7LsotROMNNZlxiy-LRxYPZa4DaynPaKYjO6X3lzY31l7jdlnKPZ1fi9wD24Jouo3iGnS2jk92jBEF5I4zotXe4T3mNEaY'),
-('изображение 18', 'описание изображения 3', 'https://s996sas.storage.yandex.net/rdisk/b0610f1976653b4df3d23999bec384583593d3e9bccaf3a82f5f605188a4ed3d/68be0506/g3mGS569L3NQndLWXmyBWDbeE3sFkxmUmsm7sE9HtJQ7YSwPogqBRDTRA-kDPwGY_gE0KWWt5Qurw1g547GlBw==?uid=777910961&filename=Конец%20октября.%202024.Холст%2C%20масло.%2080х130см.jpg&disposition=inline&hash=&limit=0&content_type=image%2Fjpeg&owner_uid=777910961&fsize=848307&hid=d9ffe5b9a92b356aeb2ffdf00c3aee04&media_type=image&tknv=v3&etag=0d45e3f07cce76c438d41a6094efd1d9&ts=63e3d7826cd80&s=f8164ad740d19d519a395e2944e108eb6430ce6e27abcda70989432a8e1421b0&pb=U2FsdGVkX1_Bss7T2FWGe7sEKpirhQ1POTyigxofA9rP3AQ-ioUeB8fJbKjk94lp1hdD1Uw7UHAHuePNHyTgQz_ulgi0Mot6pF81-tJ2J1s'),
-('изображение 19', 'описание изображения 1', 'https://s287vla.storage.yandex.net/rdisk/89c04cb3db2b728ad1c1213f47ac8ac7fea34f2c0985f7cdf7861fda24ed30d9/68be047e/g3mGS569L3NQndLWXmyBWJuolrjUnNg_71lzo-sP7wZQuTy_prUGB4YPTbAUBruOMGnPBdFxakD2jMDiVi0WUw==?uid=777910961&filename=Весна.-2024.-Холст_-масло.-13-х-80-см_1%20%281%29.webp&disposition=inline&hash=&limit=0&content_type=image%2Fwebp&owner_uid=777910961&fsize=269238&hid=76298eef7121bba0a6c4e6f2ef68e534&media_type=image&tknv=v3&etag=6df93c5f71b36db921042b131c25c1e2&ts=63e3d700b9b80&s=d94eb6edb2fa657662da66e55c84a2b376dd5467c4f1b8a7bb399ee6d368a60c&pb=U2FsdGVkX1_Y-VePhSj8EwPbdnyOL0fhlc9lz-1R3q2voQrgGIhv400be-M4OdKF2KNHGRpRBUN8pISj2Mw-s304OkZcD7i4gIknFfiXP-0'),
-('изображение 20', 'описание изображения 2', 'https://s1015sas.storage.yandex.net/rdisk/3b50b4f14c74149340fbed3d8ba764b0a9b790b14639cc823967a2e833e037e3/68be04f2/g3mGS569L3NQndLWXmyBWLhUSA8zTBerKb4Cz9cAzgHCs_7eIvswqDCuUXk0oZdsV2KIGAJjRgJpgcrn6XVTnw==?uid=777910961&filename=Вечерний%20проспект.%202024.%20Холст%2C%20масло.%2080%20х%20130%20см.%20.jpg&disposition=inline&hash=&limit=0&content_type=image%2Fjpeg&owner_uid=777910961&fsize=1098413&hid=8b8ff09987b90209bed34ae788ffbd8d&media_type=image&tknv=v3&etag=e348feb1749f7999a6dd6d191c10a555&ts=63e3d76f5a080&s=5afa94e0f4245636e74b96d462cf7fd559a7a6946725946c6118c87457fdd3ec&pb=U2FsdGVkX18zIB7LsotROMNNZlxiy-LRxYPZa4DaynPaKYjO6X3lzY31l7jdlnKPZ1fi9wD24Jouo3iGnS2jk92jBEF5I4zotXe4T3mNEaY'),
-('изображение 21', 'описание изображения 3', 'https://s996sas.storage.yandex.net/rdisk/b0610f1976653b4df3d23999bec384583593d3e9bccaf3a82f5f605188a4ed3d/68be0506/g3mGS569L3NQndLWXmyBWDbeE3sFkxmUmsm7sE9HtJQ7YSwPogqBRDTRA-kDPwGY_gE0KWWt5Qurw1g547GlBw==?uid=777910961&filename=Конец%20октября.%202024.Холст%2C%20масло.%2080х130см.jpg&disposition=inline&hash=&limit=0&content_type=image%2Fjpeg&owner_uid=777910961&fsize=848307&hid=d9ffe5b9a92b356aeb2ffdf00c3aee04&media_type=image&tknv=v3&etag=0d45e3f07cce76c438d41a6094efd1d9&ts=63e3d7826cd80&s=f8164ad740d19d519a395e2944e108eb6430ce6e27abcda70989432a8e1421b0&pb=U2FsdGVkX1_Bss7T2FWGe7sEKpirhQ1POTyigxofA9rP3AQ-ioUeB8fJbKjk94lp1hdD1Uw7UHAHuePNHyTgQz_ulgi0Mot6pF81-tJ2J1s'),
-('изображение 22', 'описание изображения 1', 'https://s287vla.storage.yandex.net/rdisk/89c04cb3db2b728ad1c1213f47ac8ac7fea34f2c0985f7cdf7861fda24ed30d9/68be047e/g3mGS569L3NQndLWXmyBWJuolrjUnNg_71lzo-sP7wZQuTy_prUGB4YPTbAUBruOMGnPBdFxakD2jMDiVi0WUw==?uid=777910961&filename=Весна.-2024.-Холст_-масло.-13-х-80-см_1%20%281%29.webp&disposition=inline&hash=&limit=0&content_type=image%2Fwebp&owner_uid=777910961&fsize=269238&hid=76298eef7121bba0a6c4e6f2ef68e534&media_type=image&tknv=v3&etag=6df93c5f71b36db921042b131c25c1e2&ts=63e3d700b9b80&s=d94eb6edb2fa657662da66e55c84a2b376dd5467c4f1b8a7bb399ee6d368a60c&pb=U2FsdGVkX1_Y-VePhSj8EwPbdnyOL0fhlc9lz-1R3q2voQrgGIhv400be-M4OdKF2KNHGRpRBUN8pISj2Mw-s304OkZcD7i4gIknFfiXP-0'),
-('изображение 23', 'описание изображения 2', 'https://s1015sas.storage.yandex.net/rdisk/3b50b4f14c74149340fbed3d8ba764b0a9b790b14639cc823967a2e833e037e3/68be04f2/g3mGS569L3NQndLWXmyBWLhUSA8zTBerKb4Cz9cAzgHCs_7eIvswqDCuUXk0oZdsV2KIGAJjRgJpgcrn6XVTnw==?uid=777910961&filename=Вечерний%20проспект.%202024.%20Холст%2C%20масло.%2080%20х%20130%20см.%20.jpg&disposition=inline&hash=&limit=0&content_type=image%2Fjpeg&owner_uid=777910961&fsize=1098413&hid=8b8ff09987b90209bed34ae788ffbd8d&media_type=image&tknv=v3&etag=e348feb1749f7999a6dd6d191c10a555&ts=63e3d76f5a080&s=5afa94e0f4245636e74b96d462cf7fd559a7a6946725946c6118c87457fdd3ec&pb=U2FsdGVkX18zIB7LsotROMNNZlxiy-LRxYPZa4DaynPaKYjO6X3lzY31l7jdlnKPZ1fi9wD24Jouo3iGnS2jk92jBEF5I4zotXe4T3mNEaY'),
-('изображение 24', 'описание изображения 3', 'https://s996sas.storage.yandex.net/rdisk/b0610f1976653b4df3d23999bec384583593d3e9bccaf3a82f5f605188a4ed3d/68be0506/g3mGS569L3NQndLWXmyBWDbeE3sFkxmUmsm7sE9HtJQ7YSwPogqBRDTRA-kDPwGY_gE0KWWt5Qurw1g547GlBw==?uid=777910961&filename=Конец%20октября.%202024.Холст%2C%20масло.%2080х130см.jpg&disposition=inline&hash=&limit=0&content_type=image%2Fjpeg&owner_uid=777910961&fsize=848307&hid=d9ffe5b9a92b356aeb2ffdf00c3aee04&media_type=image&tknv=v3&etag=0d45e3f07cce76c438d41a6094efd1d9&ts=63e3d7826cd80&s=f8164ad740d19d519a395e2944e108eb6430ce6e27abcda70989432a8e1421b0&pb=U2FsdGVkX1_Bss7T2FWGe7sEKpirhQ1POTyigxofA9rP3AQ-ioUeB8fJbKjk94lp1hdD1Uw7UHAHuePNHyTgQz_ulgi0Mot6pF81-tJ2J1s'),
-('изображение 25', 'описание изображения 1', 'https://s287vla.storage.yandex.net/rdisk/89c04cb3db2b728ad1c1213f47ac8ac7fea34f2c0985f7cdf7861fda24ed30d9/68be047e/g3mGS569L3NQndLWXmyBWJuolrjUnNg_71lzo-sP7wZQuTy_prUGB4YPTbAUBruOMGnPBdFxakD2jMDiVi0WUw==?uid=777910961&filename=Весна.-2024.-Холст_-масло.-13-х-80-см_1%20%281%29.webp&disposition=inline&hash=&limit=0&content_type=image%2Fwebp&owner_uid=777910961&fsize=269238&hid=76298eef7121bba0a6c4e6f2ef68e534&media_type=image&tknv=v3&etag=6df93c5f71b36db921042b131c25c1e2&ts=63e3d700b9b80&s=d94eb6edb2fa657662da66e55c84a2b376dd5467c4f1b8a7bb399ee6d368a60c&pb=U2FsdGVkX1_Y-VePhSj8EwPbdnyOL0fhlc9lz-1R3q2voQrgGIhv400be-M4OdKF2KNHGRpRBUN8pISj2Mw-s304OkZcD7i4gIknFfiXP-0'),
-('изображение 6', 'описание изображения 2', 'https://s1015sas.storage.yandex.net/rdisk/3b50b4f14c74149340fbed3d8ba764b0a9b790b14639cc823967a2e833e037e3/68be04f2/g3mGS569L3NQndLWXmyBWLhUSA8zTBerKb4Cz9cAzgHCs_7eIvswqDCuUXk0oZdsV2KIGAJjRgJpgcrn6XVTnw==?uid=777910961&filename=Вечерний%20проспект.%202024.%20Холст%2C%20масло.%2080%20х%20130%20см.%20.jpg&disposition=inline&hash=&limit=0&content_type=image%2Fjpeg&owner_uid=777910961&fsize=1098413&hid=8b8ff09987b90209bed34ae788ffbd8d&media_type=image&tknv=v3&etag=e348feb1749f7999a6dd6d191c10a555&ts=63e3d76f5a080&s=5afa94e0f4245636e74b96d462cf7fd559a7a6946725946c6118c87457fdd3ec&pb=U2FsdGVkX18zIB7LsotROMNNZlxiy-LRxYPZa4DaynPaKYjO6X3lzY31l7jdlnKPZ1fi9wD24Jouo3iGnS2jk92jBEF5I4zotXe4T3mNEaY'),
-('изображение 27', 'описание изображения 3', 'https://s996sas.storage.yandex.net/rdisk/b0610f1976653b4df3d23999bec384583593d3e9bccaf3a82f5f605188a4ed3d/68be0506/g3mGS569L3NQndLWXmyBWDbeE3sFkxmUmsm7sE9HtJQ7YSwPogqBRDTRA-kDPwGY_gE0KWWt5Qurw1g547GlBw==?uid=777910961&filename=Конец%20октября.%202024.Холст%2C%20масло.%2080х130см.jpg&disposition=inline&hash=&limit=0&content_type=image%2Fjpeg&owner_uid=777910961&fsize=848307&hid=d9ffe5b9a92b356aeb2ffdf00c3aee04&media_type=image&tknv=v3&etag=0d45e3f07cce76c438d41a6094efd1d9&ts=63e3d7826cd80&s=f8164ad740d19d519a395e2944e108eb6430ce6e27abcda70989432a8e1421b0&pb=U2FsdGVkX1_Bss7T2FWGe7sEKpirhQ1POTyigxofA9rP3AQ-ioUeB8fJbKjk94lp1hdD1Uw7UHAHuePNHyTgQz_ulgi0Mot6pF81-tJ2J1s'),
-('изображение 28', 'описание изображения 1', 'https://s287vla.storage.yandex.net/rdisk/89c04cb3db2b728ad1c1213f47ac8ac7fea34f2c0985f7cdf7861fda24ed30d9/68be047e/g3mGS569L3NQndLWXmyBWJuolrjUnNg_71lzo-sP7wZQuTy_prUGB4YPTbAUBruOMGnPBdFxakD2jMDiVi0WUw==?uid=777910961&filename=Весна.-2024.-Холст_-масло.-13-х-80-см_1%20%281%29.webp&disposition=inline&hash=&limit=0&content_type=image%2Fwebp&owner_uid=777910961&fsize=269238&hid=76298eef7121bba0a6c4e6f2ef68e534&media_type=image&tknv=v3&etag=6df93c5f71b36db921042b131c25c1e2&ts=63e3d700b9b80&s=d94eb6edb2fa657662da66e55c84a2b376dd5467c4f1b8a7bb399ee6d368a60c&pb=U2FsdGVkX1_Y-VePhSj8EwPbdnyOL0fhlc9lz-1R3q2voQrgGIhv400be-M4OdKF2KNHGRpRBUN8pISj2Mw-s304OkZcD7i4gIknFfiXP-0'),
-('изображение 29', 'описание изображения 2', 'https://s1015sas.storage.yandex.net/rdisk/3b50b4f14c74149340fbed3d8ba764b0a9b790b14639cc823967a2e833e037e3/68be04f2/g3mGS569L3NQndLWXmyBWLhUSA8zTBerKb4Cz9cAzgHCs_7eIvswqDCuUXk0oZdsV2KIGAJjRgJpgcrn6XVTnw==?uid=777910961&filename=Вечерний%20проспект.%202024.%20Холст%2C%20масло.%2080%20х%20130%20см.%20.jpg&disposition=inline&hash=&limit=0&content_type=image%2Fjpeg&owner_uid=777910961&fsize=1098413&hid=8b8ff09987b90209bed34ae788ffbd8d&media_type=image&tknv=v3&etag=e348feb1749f7999a6dd6d191c10a555&ts=63e3d76f5a080&s=5afa94e0f4245636e74b96d462cf7fd559a7a6946725946c6118c87457fdd3ec&pb=U2FsdGVkX18zIB7LsotROMNNZlxiy-LRxYPZa4DaynPaKYjO6X3lzY31l7jdlnKPZ1fi9wD24Jouo3iGnS2jk92jBEF5I4zotXe4T3mNEaY'),
-('изображение 30', 'описание изображения 3', 'https://s996sas.storage.yandex.net/rdisk/b0610f1976653b4df3d23999bec384583593d3e9bccaf3a82f5f605188a4ed3d/68be0506/g3mGS569L3NQndLWXmyBWDbeE3sFkxmUmsm7sE9HtJQ7YSwPogqBRDTRA-kDPwGY_gE0KWWt5Qurw1g547GlBw==?uid=777910961&filename=Конец%20октября.%202024.Холст%2C%20масло.%2080х130см.jpg&disposition=inline&hash=&limit=0&content_type=image%2Fjpeg&owner_uid=777910961&fsize=848307&hid=d9ffe5b9a92b356aeb2ffdf00c3aee04&media_type=image&tknv=v3&etag=0d45e3f07cce76c438d41a6094efd1d9&ts=63e3d7826cd80&s=f8164ad740d19d519a395e2944e108eb6430ce6e27abcda70989432a8e1421b0&pb=U2FsdGVkX1_Bss7T2FWGe7sEKpirhQ1POTyigxofA9rP3AQ-ioUeB8fJbKjk94lp1hdD1Uw7UHAHuePNHyTgQz_ulgi0Mot6pF81-tJ2J1s'),
-('изображение 31', 'описание изображения 1', 'https://s287vla.storage.yandex.net/rdisk/89c04cb3db2b728ad1c1213f47ac8ac7fea34f2c0985f7cdf7861fda24ed30d9/68be047e/g3mGS569L3NQndLWXmyBWJuolrjUnNg_71lzo-sP7wZQuTy_prUGB4YPTbAUBruOMGnPBdFxakD2jMDiVi0WUw==?uid=777910961&filename=Весна.-2024.-Холст_-масло.-13-х-80-см_1%20%281%29.webp&disposition=inline&hash=&limit=0&content_type=image%2Fwebp&owner_uid=777910961&fsize=269238&hid=76298eef7121bba0a6c4e6f2ef68e534&media_type=image&tknv=v3&etag=6df93c5f71b36db921042b131c25c1e2&ts=63e3d700b9b80&s=d94eb6edb2fa657662da66e55c84a2b376dd5467c4f1b8a7bb399ee6d368a60c&pb=U2FsdGVkX1_Y-VePhSj8EwPbdnyOL0fhlc9lz-1R3q2voQrgGIhv400be-M4OdKF2KNHGRpRBUN8pISj2Mw-s304OkZcD7i4gIknFfiXP-0'),
-('изображение 32', 'описание изображения 2', 'https://s1015sas.storage.yandex.net/rdisk/3b50b4f14c74149340fbed3d8ba764b0a9b790b14639cc823967a2e833e037e3/68be04f2/g3mGS569L3NQndLWXmyBWLhUSA8zTBerKb4Cz9cAzgHCs_7eIvswqDCuUXk0oZdsV2KIGAJjRgJpgcrn6XVTnw==?uid=777910961&filename=Вечерний%20проспект.%202024.%20Холст%2C%20масло.%2080%20х%20130%20см.%20.jpg&disposition=inline&hash=&limit=0&content_type=image%2Fjpeg&owner_uid=777910961&fsize=1098413&hid=8b8ff09987b90209bed34ae788ffbd8d&media_type=image&tknv=v3&etag=e348feb1749f7999a6dd6d191c10a555&ts=63e3d76f5a080&s=5afa94e0f4245636e74b96d462cf7fd559a7a6946725946c6118c87457fdd3ec&pb=U2FsdGVkX18zIB7LsotROMNNZlxiy-LRxYPZa4DaynPaKYjO6X3lzY31l7jdlnKPZ1fi9wD24Jouo3iGnS2jk92jBEF5I4zotXe4T3mNEaY'),
-('изображение 33', 'описание изображения 3', 'https://s996sas.storage.yandex.net/rdisk/b0610f1976653b4df3d23999bec384583593d3e9bccaf3a82f5f605188a4ed3d/68be0506/g3mGS569L3NQndLWXmyBWDbeE3sFkxmUmsm7sE9HtJQ7YSwPogqBRDTRA-kDPwGY_gE0KWWt5Qurw1g547GlBw==?uid=777910961&filename=Конец%20октября.%202024.Холст%2C%20масло.%2080х130см.jpg&disposition=inline&hash=&limit=0&content_type=image%2Fjpeg&owner_uid=777910961&fsize=848307&hid=d9ffe5b9a92b356aeb2ffdf00c3aee04&media_type=image&tknv=v3&etag=0d45e3f07cce76c438d41a6094efd1d9&ts=63e3d7826cd80&s=f8164ad740d19d519a395e2944e108eb6430ce6e27abcda70989432a8e1421b0&pb=U2FsdGVkX1_Bss7T2FWGe7sEKpirhQ1POTyigxofA9rP3AQ-ioUeB8fJbKjk94lp1hdD1Uw7UHAHuePNHyTgQz_ulgi0Mot6pF81-tJ2J1s')
- */

@@ -1,0 +1,8 @@
+.root{
+  padding: var(--header-height) var(--spacing-xl);
+}
+
+.container {
+  display: flex;
+  flex-direction: column
+}

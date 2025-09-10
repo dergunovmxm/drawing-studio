@@ -2,11 +2,11 @@
   height: var(--header-height);
   box-sizing: border-box;
   padding: var(--spacing-l);
-  position: fixed;
   display: flex;
   justify-content: flex-end;
-
   width: 100%;
+  position: absolute;
+
 }
 
 .navs {
@@ -14,6 +14,7 @@
   gap: 24px;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
 .li {
   margin: 0 8spx;
