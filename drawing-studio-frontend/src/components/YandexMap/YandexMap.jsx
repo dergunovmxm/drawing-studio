@@ -4,7 +4,8 @@
 // Пример использования:
 // <YandexMap apiKey="ВАШ_API_КЛЮЧ" defaultCenter={[55.751574, 37.573856]} zoom={12} showUserLocation={true} height="400px" />
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import styles from './YandexMap.module.scss'
 
 function loadYandexScript(apiKey, lang = "ru_RU") {
   const global = window;
@@ -40,17 +41,18 @@ function loadYandexScript(apiKey, lang = "ru_RU") {
 
 export default function YandexMap({
   apiKey = "4b3403e8-92a8-460d-8242-b0a0c1125234",
-  defaultCenter = [ 54.382520, 48.595037], // Москва по умолчанию
+  defaultCenter = [ 54.382520, 48.595037],
+  height = "100%",
+  width ="100%",
   zoom = 16,
-  height = "400px",
-  width = "100%",
   showUserLocation = false,
-  placemarkProps = { hintContent: "Метка", balloonContent: "Здесь" },
+  placemarkProps = { hintContent: "Одна/шестая", balloonContent: "Здесь" },
   onMapReady = null, // callback(map, ymaps)
 }) {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
   const placemarkRef = useRef(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let mounted = true;
@@ -60,11 +62,8 @@ export default function YandexMap({
         const ymaps = await loadYandexScript(apiKey);
         if (!mounted) return;
         await ymaps.ready();
-
-        // Создать карту только если контейнер доступен и карта ещё не создана
         if (!containerRef.current) return;
         if (mapRef.current) {
-          // Обновим центр и зум если нужно
           mapRef.current.setCenter(defaultCenter);
           mapRef.current.setZoom(zoom);
           return;
@@ -118,6 +117,7 @@ export default function YandexMap({
         if (typeof onMapReady === "function") {
           onMapReady(map, ymaps);
         }
+        setLoading(false);
       } catch (err) {
         console.error("Failed to initialize Yandex.Maps:", err);
       }
@@ -132,11 +132,11 @@ export default function YandexMap({
         mapRef.current = null;
         placemarkRef.current = null;
       }
+      setLoading(false);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiKey]); // при смене apiKey перезагружается скрипт/инициализация
 
-  // Статические стили контейнера; можно переопределить через пропсы
   const containerStyle = {
     width,
     height,
@@ -144,7 +144,17 @@ export default function YandexMap({
 
   return (
     <div style={containerStyle}>
-      <div ref={containerRef} style={{ width: "500px", height: "100%" }} />
+      <div className={styles.skeleton}>
+        {loading && (
+          <div className={styles.map_skeleton} aria-hidden="true">
+            <div className={styles.map_skeleton_pulse} />
+          </div>
+        )}
+        <div
+          ref={containerRef}
+          className={styles.map}
+        />
+      </div>
     </div>
   );
 }

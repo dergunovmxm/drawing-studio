@@ -1,14 +1,15 @@
+import cs from 'clsx'
 import styles from './Typography.module.scss'
 
-const Typography = ({name, text}) => {
+const Typography = ({name, text, className}) => {
   return(
     <>
-      {name == 'title1' && (<h1 className={styles.title1}>{text}</h1>)}
-      {name == 'title2' && (<h2 className={styles.title2}>{text}</h2>)}
-      {name == 'title3' && (<h2 className={styles.title3}>{text}</h2>)}
-      {name == 'subtitle1' && (<h3 className={styles.subtitle1}>{text}</h3>)}
-      {name == 'caption1' && (<span className={styles.caption1}>{text}</span>)}
-      {name == 'caption2' && (<span className={styles.caption2}>{text}</span>)}
+      {name == 'title1' && (<h1 className={cs(styles.title1, className)}>{text}</h1>)}
+      {name == 'title2' && (<h2 className={cs(styles.title2, className)}>{text}</h2>)}
+      {name == 'title3' && (<h2 className={cs(styles.title3, className)}>{text}</h2>)}
+      {name == 'subtitle1' && (<h3 className={cs(styles.subtitle1, className)}>{text}</h3>)}
+      {name == 'caption1' && (<span className={cs(styles.caption1, className)}>{text}</span>)}
+      {name == 'caption2' && (<span className={cs(styles.caption2, className)}>{text}</span>)}
     </>
   )
 }

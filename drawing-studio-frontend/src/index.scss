@@ -1,9 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 :root {
   
   background-color: rgba(144,142,127,0.7);
-  --primary-text-color: #FFF;
+  --primary-color: #FFF;
 
   --header-height: 72px;
   --spacing-xs: 4px;
@@ -11,6 +10,8 @@
   --spacing-m: 16px;
   --spacing-l: 24px;
   --spacing-xl: 32px;
+
+  --border-radius: 8px;
 
 
   font-synthesis: none;
@@ -27,7 +28,7 @@
 
 html, body, #root {
   height: 100%;
-  font-family: "IBM Plex Sans", sans-serif;
+  font-family: "Montserrat", sans-serif;
 }
 body {
   margin: 0;

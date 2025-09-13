@@ -1,0 +1,39 @@
+.root{
+
+}
+
+.skeleton{ 
+  position: relative; 
+  width: 100%; 
+  height: 100% 
+}
+.map {
+  width: 100%; 
+  height: 100% 
+}
+
+.map_skeleton {
+  position: absolute;
+  inset: 0; /* top:0; right:0; bottom:0; left:0; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 37%, #f0f0f0 63%);
+  background-size: 400% 100%;
+  z-index: 10;
+  /* можно добавить бордер-радиус и т.д. */
+}
+
+/* анимация пульсации */
+.map_skeleton_pulse-pulse {
+  width: 60%;
+  height: 60%;
+  background: rgba(255,255,255,0.6);
+  border-radius: 8px;
+  animation: shimmer 1.6s linear infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

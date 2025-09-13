@@ -1,7 +1,7 @@
 .title1 {
-  color: var(--primary-text-color);
-  font-size: 52px;
-  line-height: 1.5;
+  color: var(--primary-color);
+  font-size: 5vw;
+  line-height: normal;
   letter-spacing: .3px;
   font-weight: 600;
   margin:0;
@@ -9,11 +9,16 @@
 }
 
 .title2 {
-  color: var(--primary-text-color);
+  color: var(--primary-color);
+  font-size: 52px;
+  line-height: normal;
+  letter-spacing: .3px;
+  font-weight: 400;
+  margin:0;
 }
 
 .title3 {
-  color: var(--primary-text-color);
+  color: var(--primary-color);
   font-size: 38px;
   line-height: 1.5;
   letter-spacing: .3px;
@@ -23,11 +28,13 @@
 }
 
 .subtitle1 {
-  color: var(--primary-text-color);
+  color: var(--primary-color);
+
 }
 
 .caption1 {
-  color: var(--primary-text-color);
+  color: var(--primary-color);
+
   font-size: 30px;
   line-height: 1.5;
   font-weight: 300;
@@ -35,7 +42,8 @@
 
 
 .caption2 {
-  color: var(--primary-text-color);
+  color: var(--primary-color);
+
   font-size: 18px;
   line-height: 1.5;
   font-weight: 300;
