@@ -10,3 +10,21 @@ export function getRandomItems(arr, n) {
   }
   return result.slice(0, n);
 }
+
+export function pickRandomPerAlias(data) {
+  if (!Array.isArray(data)) return [];
+
+  const groups = data.reduce((acc, item) => {
+    const key = item.alias ?? "__no_alias__";
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(item);
+    return acc;
+  }, {});
+
+  const result = Object.values(groups).map((group) => {
+    const i = Math.floor(Math.random() * group.length);
+    return group[i];
+  });
+
+  return result;
+}

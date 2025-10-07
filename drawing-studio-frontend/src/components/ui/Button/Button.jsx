@@ -35,7 +35,7 @@ const Button = ({
         <span className={styles.iconLeft}>{leftIcon}</span>
       ) : null}
 
-      <span className={styles.content}>{children}</span>
+        {children}
 
       {!loading && rightIcon ? (
         <span className={styles.iconRight}>{rightIcon}</span>

@@ -10,28 +10,18 @@ export const navs = [
   {
     path: "/gallery",
     name: "Галерея",
+    dropdown: [
+      { link: "/gallery/znaki", name: "Знаки" },
+      { link: "/gallery/poetry", name: "Поэзия юности" },
+      { link: "/gallery/free", name: "Произвольные произведения" },
+      { link: "/gallery/scenery", name: "Пейзажи" },
+      { link: "/gallery/sculpture", name: "Скульптуры" },
+      { link: "/gallery/life", name: "Натюрморты" },
+      { link: "/gallery/experiments", name: "Эксперименты" },
+    ],
   },
   {
     path: "/contacts",
     name: "Контакты",
-  },
-];
-
-export const portfolio = [
-  {
-    path: "/project-znaki",
-    name: `Проект "Знаки"`,
-  },
-  {
-    path: "/project-poeziya-yunosti",
-    name: `Проект "Поэзия Юности"`,
-  },
-  {
-    path: "/proizvolniye-proizvedeniya",
-    name: "Произвольные произведения",
-  },
-  {
-    path: "/peizaghy-etudy",
-    name: "Пейзажи, этюды",
   },
 ];

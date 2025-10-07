@@ -1,10 +1,11 @@
 import React from "react";
+import styles from './Breadcrumbs.module.scss'
+import Typography from "../ui";
 
 export const Breadcrumbs = ({
   items,
   maxItems = 5,
   separator = "›",
-  className = "",
   crumbClassName = "",
   activeClassName = "",
   renderItem,
@@ -27,8 +28,8 @@ export const Breadcrumbs = ({
   }
 
   return (
-    <nav aria-label="breadcrumb" className={className}>
-      <ol style={{ listStyle: "none", display: "flex", padding: 0, margin: 0, gap: 8 }}>
+    <nav aria-label="breadcrumb" className={styles.breadcrumbs}>
+      <ol className={styles.list}>
         {visible.map((it, idx) => {
           if (it && it.ellipsis) {
             return (
@@ -50,26 +51,24 @@ export const Breadcrumbs = ({
                   href={item.href}
                   onClick={item.onClick}
                   className={crumbClassName}
-                  style={{ textDecoration: "none", color: "#007bff" }}
+                  style={{ textDecoration: "none" }}
                 >
-                  {item.label}
+                  <Typography name='caption4' text={item.label}/>
                 </a>
               ) : (
-                <span
-                  className={isLast ? `${crumbClassName} ${activeClassName}` : crumbClassName}
-                  aria-current={isLast ? "page" : undefined}
-                  style={isLast ? { color: "#111", fontWeight: 600 } : { color: "#007bff" }}
-                >
-                  {item.label}
-                </span>
+                <Typography 
+                  className={isLast ? `${crumbClassName} ${activeClassName}` : crumbClassName} 
+                  name={isLast ? 'caption4' : 'caption5'} 
+                  text={item.label}
+                />
               )}
             </>
           );
 
           return (
-            <li key={key} style={{ display: "flex", alignItems: "center" }}>
+            <li key={key}  style={{ display: "flex", alignItems: "center" }}>
               {renderItem ? renderItem(item, isLast, idx) : defaultRender}
-              {idx !== visible.length - 1 && <span aria-hidden style={{ margin: "0 8px", color: "#999" }}>{separator}</span>}
+              {idx !== visible.length - 1 && <Typography name='caption4' className={styles.separator} text={separator} />}
             </li>
           );
         })}

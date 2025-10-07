@@ -5,6 +5,10 @@ export const useGroupImage = (items) => {
     znaki: "Знаки",
     poetry: "Поэзия юности",
     free: "Произвольные произведения",
+    sculpture: "Скульптуры",
+    scenery: "Пейзажи",
+    life: "Натюрморты",
+    experiments: "Эксперименты",
   };
 
   const grouped = useMemo(() => {
@@ -24,5 +28,5 @@ export const useGroupImage = (items) => {
     return Array.from(map.values());
   }, [items]);
 
-  return grouped;
+  return { grouped, aliasNames };
 };

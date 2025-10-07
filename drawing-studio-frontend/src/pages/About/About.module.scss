@@ -1,8 +1,64 @@
 .root{
-  padding: var(--header-height) var(--spacing-xl);
-  height: calc(100vh - var(--header-height));
+  padding: var(--header-height) calc(var(--spacing-l) * 2);
+  box-sizing: border-box;
+  overflow: hidden;
+  @media (max-width: 480px) {
+    padding: var(--header-height) var(--spacing-xl);
+  }
 }
 
 .title {
   margin: var(--spacing-xl) 0;
+}
+
+.aboutMain {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-xl);
+  padding-bottom: calc(var(--spacing-xl) * 2);
+  @media (max-width: 480px) {
+    flex-direction: column;
+  }
+}
+
+
+.imageWripper {
+  display: flex;
+  justify-content: flex-start;
+  @media (max-width: 480px) {
+    justify-content: center;
+
+  }
+}
+
+.imageWripper img {
+  width: 400px;
+  height: 400px;
+
+  object-fit: cover;
+  object-position: top;
+  display: block;
+
+  @media (max-width: 480px) {
+    max-width: 296px;
+    max-height: 296px;
+  }
+}
+
+.kredoWripper{
+
+  width: 100%;
+  background-image: linear-gradient(to bottom, rgba(89,61,39,0.9), rgba(144,142,127,0.9)), url('../../assets//main.jpg');
+  background-size: cover;
+  background-position: top;
+  background-repeat: no-repeat;
+  scale: 1.1;
+
+  padding: var(--spacing-xl) 5%;
+  margin: var(--header-height) 0;
+}
+
+.exhibitionItem {
+  display: flex;
+  flex-direction: column;
 }

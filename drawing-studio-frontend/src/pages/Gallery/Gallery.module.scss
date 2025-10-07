@@ -1,6 +1,9 @@
 .root{
-  padding: var(--header-height) var(--spacing-xl);
-  height: calc(100vh - var(--header-height));
+  padding: var(--header-height) calc(var(--spacing-l) * 2);
+  min-height: 560px;
+  @media (max-width: 480px) {
+    padding: var(--header-height) var(--spacing-xl);
+  }
 }
 
 .title {
@@ -9,5 +12,34 @@
 
 .container {
   display: flex;
-  flex-direction: column
+  flex-direction: column;
+  gap: var(--spacing-xl)
+}
+
+.buttonContainer { 
+  display: flex;
+  width: 100%; 
+  justify-content: center;
+  margin: var(--spacing-l) 0;
+}
+
+.galleryAddon {
+  padding: var(--spacing-l) var(--spacing-xl);
+  display: flex;
+  justify-content: flex-end;
+  > span {
+    display: block;
+    border-left: 1px solid rgba(165,165,165,0.5);
+    padding: 0 var(--spacing-xl);
+    width: 50%;
+  }
+
+  @media (max-width: 768px) {
+    padding: var(--spacing-l) 0;
+    justify-content: flex-end;
+    > span {
+      padding: 0 var(--spacing-xl);
+      width: 100%;
+    }
+  }
 }

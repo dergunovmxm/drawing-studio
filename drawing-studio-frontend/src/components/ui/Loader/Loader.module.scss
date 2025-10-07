@@ -1,0 +1,15 @@
+.root {
+  padding: var(--header-height) var(--spacing-xl) var(--spacing-xl);
+  min-height: 100vh;
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.skeleton {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #bfbfbf 25%, #cfcfcf 50%, #bfbfbf 75%);
+  animation: shimmer 1.2s linear infinite;
+}
