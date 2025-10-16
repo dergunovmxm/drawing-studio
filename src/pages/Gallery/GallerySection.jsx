@@ -38,7 +38,7 @@ const GallerySection = () => {
   const handleClose = () => setOpen(false);
 
   if (isLoading) return <Loader />
-  if (error) return <Error error={error}/>
+  if (error) return <Error error={error.message}/>
   if (!group) return (
     <div>
       <Typography name='title3' text='Раздел не найден' />
