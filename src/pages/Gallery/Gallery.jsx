@@ -19,7 +19,7 @@ const Gallery = () => {
   const {grouped} = useGroupImage(data ?? [])
   const placeholderAliases = ["section-1", "section-2", "section-3"]
   const shouldShowSkeleton = isLoading || isFetching || isPending || (Array.isArray(data) && data.length === 0)
-  if (error) return <Error error={error}/>
+  if (error) return <Error error={error.message}/>
   return (
     <main className={styles.root}>
       <Breadcrumbs items={[{ label: "Главная", href: "/" }, { label: "Галерея", href: "/gallery" }]} separator="|" />
