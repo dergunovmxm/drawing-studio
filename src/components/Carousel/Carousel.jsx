@@ -46,6 +46,7 @@ const Carousel = ({
       slidesPerGroup={3}
       speed={2500}
       simulateTouch={true}
+      navigation={false}
       autoplay={{
         delay:4000,
         // pauseOnMouseEnter: true
