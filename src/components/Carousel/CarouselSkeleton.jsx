@@ -6,10 +6,10 @@ import styles from "./Carousel.module.scss"
 
 const CarouselSkeleton = ({ key, count }) => (
   <Swiper
-    modules={[Navigation]}
     spaceBetween={20}
     slidesPerView={3}
     slidesPerGroup={3}
+    simulateTouch={true}
     navigation
     breakpoints={{
       320: { slidesPerView: 1, slidesPerGroup: 1 },
@@ -24,10 +24,6 @@ const CarouselSkeleton = ({ key, count }) => (
         <div className={styles.entry}>
           <div className={styles.media}>
             <div className={styles.skeletonImage} />
-          </div>
-          <div className={styles.meta}>
-            <div className={styles.skeletonLineShort} />
-            <div className={styles.skeletonLine} />
           </div>
         </div>
       </SwiperSlide>
