@@ -44,9 +44,9 @@ const Carousel = ({
       spaceBetween={spaceBetween}
       slidesPerView={3}
       slidesPerGroup={3}
-      speed={1500}
+      speed={2500}
       autoplay={{
-        delay:2000,
+        delay:4000,
         // pauseOnMouseEnter: true
       }}
       breakpoints={breakpoints || defaultBreakPoints}

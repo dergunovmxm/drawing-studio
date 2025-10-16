@@ -10,8 +10,11 @@
 }
 
 .content {
-  background-color: #fff;
+  background-color: var(--primary-color);
   max-width: 80vw;
+  display: inline-flex;
+  flex-direction: column;
+
 }
 
 .imageWrapper div {
@@ -22,6 +25,10 @@
   background-color: transparent
 }
 
+.loader {
+  width: 540px;
+  height: 480px;
+}
 // .imageWrapper {
 //   display: inline-block;
 //   max-width: 80vw;
@@ -62,9 +69,15 @@
 }
 
 .caption {
-  padding: var(--spacing-s);
+  justify-content: center;
+  display: flex;
   color: #333;
   text-align: center;
+  padding: var(--spacing-s) 0;
+  & span {
+    display: block;
+    width: 70%;
+  }
 }
 
 .prev, .next {

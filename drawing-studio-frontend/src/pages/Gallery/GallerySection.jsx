@@ -9,6 +9,7 @@ import { description } from "./description";
 import React from "react";
 import ImageDetail from "../../components/ImageDetail";
 import Breadcrumbs from "../../components/Breadcrumbs";
+import Loader from "../../components/ui/Loader";
 
 
 const GallerySection = () => {
@@ -23,6 +24,7 @@ const GallerySection = () => {
   const [toggle, setToggle] = useState(true);
 
   useEffect(() => {
+    window.scrollTo(0,0)
     setToggle(true);
     const timer = setTimeout(() => setToggle(false), 500);
     return () => clearTimeout(timer);
@@ -35,7 +37,7 @@ const GallerySection = () => {
 
   const handleClose = () => setOpen(false);
 
-  if (isLoading) return <div>Загрузка...</div>;
+  if (isLoading) return <Loader />
   if (error) return <div>Ошибка: {error.message}</div>;
   if (!group) return (
     <div>
@@ -66,11 +68,12 @@ const GallerySection = () => {
             <div key={i} className={styles.skeletonImage} />
           ))
         ) : (
-          group.items.map((item, i) => (
-            <div key={i} onClick={() => {openAt(i); window.scrollTo(0, 0);}}>
-              <img src={item.link} alt={item.name} />
-            </div>
-          ))
+          group.items
+            .map((item, i) => (
+              <div key={i} onClick={() => {openAt(i); window.scrollTo(0, 0)}}>
+                <img src={item.link} alt={item.name} />
+              </div>
+            ))
         )}
       </div>
 

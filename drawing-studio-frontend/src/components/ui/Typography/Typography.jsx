@@ -19,6 +19,7 @@ const Typography = ({name, text, className}) => {
       {name == 'caption3_secondary_bold' && (<span className={cs(styles.caption3_secondary_bold, className)}>{text}</span>)}
       {name == 'caption4' && (<span className={cs(styles.caption4, className)}>{text}</span>)}
       {name == 'caption5' && (<span className={cs(styles.caption5, className)}>{text}</span>)}
+      {name == 'caption6' && (<span className={cs(styles.caption6, className)}>{text}</span>)}
       {name == 'caption_footer' && (<span className={cs(styles.caption_footer, className)}>{text}</span>)}
       {name == 'withHoverBlack' && (<span className={cs(styles.withHoverBlack, className)}>{text}</span>)}
       {name == 'link' && (<span className={cs(styles.link, className)}>{text}</span>)}

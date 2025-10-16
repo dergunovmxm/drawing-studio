@@ -2,14 +2,6 @@ import React, { useEffect, useCallback } from 'react';
 import Portal from '../ui/Portal';
 import styles from './ImageDetail.module.scss';
 import Magnifier from "react-glass-magnifier";
-import {
-  // Magnifier,
-  GlassMagnifier,
-  SideBySideMagnifier,
-  PictureInPictureMagnifier,
-  MOUSE_ACTIVATION,
-  TOUCH_ACTIVATION
-} from "react-image-magnifiers";
 import Typography from '../ui';
 
 const ImageDetail = ({ open, onClose, images = [], index = 0, onChangeIndex }) => {
@@ -32,7 +24,7 @@ const ImageDetail = ({ open, onClose, images = [], index = 0, onChangeIndex }) =
     goTo(validIndex - 1);
   }, [images.length, validIndex, goTo]);
 
-
+ 
   useEffect(() => {
     if (!open) return;
     const onKey = (e) => {
@@ -58,15 +50,15 @@ const ImageDetail = ({ open, onClose, images = [], index = 0, onChangeIndex }) =
         <div className={styles.content} onMouseDown={(e) => e.stopPropagation()}>     
           
           <div className={styles.imageWrapper}>
-            <Magnifier 
-              key={image.link} 
-              imageUrl={image.link}
-              largeImageUrl={image.link}
-              zoomFactor={2}
-              glassDimension={250}
-              glassBorderColor="#000000cc"
-              glassBorderWidth={2}
-            />
+              <Magnifier 
+                key={image.link}
+                imageUrl={image.link}
+                largeImageUrl={image.link}
+                zoomFactor={2}
+                glassDimension={250}
+                glassBorderColor="#000000cc"
+                glassBorderWidth={2}
+              />
           </div>
 
           <button className={styles.close} aria-label="Close" onClick={onClose}>×</button>
@@ -85,10 +77,9 @@ const ImageDetail = ({ open, onClose, images = [], index = 0, onChangeIndex }) =
             type="button"
           >›</button>
 
-          {(image.title || image.description) && (
+          {image.title && (
             <div className={styles.caption}>
-              {image.title && <Typography className={styles.title} name='caption4' text={image.title} />}
-              {image.description && <Typography className={styles.description} name='caption4' text={image.description} />}
+              {image.title && <Typography className={styles.title} name='caption6' text={image.title} />}
             </div>
           )}
 

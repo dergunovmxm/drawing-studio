@@ -117,6 +117,21 @@
   font-weight: 600;
 }
 
+.caption6 {
+  color: var(--secondary-color);
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 400;
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 12px;
+  }
+}
+
 .caption_footer {
   color: var(--primary-color);
   opacity: 0.5;

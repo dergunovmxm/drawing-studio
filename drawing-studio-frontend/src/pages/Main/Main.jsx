@@ -1,15 +1,10 @@
 import React from 'react';
 import Typography from '../../components/ui';
-import Button from '../../components/ui/Button';
-import { pickRandomPerAlias } from '../../helper/getRandomImages';
-import { useFetchImage } from "../../hooks/uaeFetchImage";
 import styles from './Main.module.scss';
 import Carousel from '../../components/Carousel';
+import { headers } from './description'
 
 const Main = () => {
-
-  const { data } = useFetchImage();
-  const imageHeaders = pickRandomPerAlias(data)
 
   return (
     <main className={styles.root}>
@@ -24,7 +19,7 @@ const Main = () => {
 
       <section>
         <Carousel 
-          entries={imageHeaders} 
+          entries={headers} 
           spaceBetween={0} 
           entryClassName={styles.imageHeaders} 
           mediaClassName={styles.imageHeadersMedia}

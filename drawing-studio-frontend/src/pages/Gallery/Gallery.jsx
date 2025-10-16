@@ -34,7 +34,7 @@ const Gallery = () => {
 
         { shouldShowSkeleton  ? (
           placeholderAliases.map((alias) => (
-            <CarouselSkeleton key={alias} count={3} />
+            <CarouselSkeleton key={alias} count={4} />
           ))
         ) : (
           grouped.map(({ alias, rus, items }) => (
