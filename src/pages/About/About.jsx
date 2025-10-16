@@ -12,7 +12,7 @@ const About = () => {
 
       <section className={styles.aboutMain}>
         <div className={styles.imageWripper}>
-          <img src='public/photo1.jpg' alt='main' />
+          <img src='photo1.jpg' alt='main' />
         </div>
         <article>
           {main.map((item) => (
