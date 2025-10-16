@@ -8,6 +8,7 @@ import { useFetchImage } from "../../hooks/uaeFetchImage"
 import Breadcrumbs from "../../components/Breadcrumbs"
 import Button from "../../components/ui/Button"
 import { description } from "./description"
+import Error from '../../components/ui/Error'
 
 
 const Gallery = () => {
@@ -18,9 +19,7 @@ const Gallery = () => {
   const {grouped} = useGroupImage(data ?? [])
   const placeholderAliases = ["section-1", "section-2", "section-3"]
   const shouldShowSkeleton = isLoading || isFetching || isPending || (Array.isArray(data) && data.length === 0)
-
-  if (error) return <div>Ошибка: {error?.message}</div>
-
+  if (error) return <Error error={error}/>
   return (
     <main className={styles.root}>
       <Breadcrumbs items={[{ label: "Главная", href: "/" }, { label: "Галерея", href: "/gallery" }]} separator="|" />
