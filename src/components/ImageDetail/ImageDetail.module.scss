@@ -19,20 +19,26 @@
 
 .imageWrapper div {
   padding: 0;
+  @media (max-width: 480px) {
+    display: none;
+  }
 }
 
 .imageWrapper div div {
   background-color: transparent
 }
 
+.mobileImage {
+  display: none;
+  @media (max-width: 480px) {
+    display: block;
+  }
+}
+
 .loader {
   width: 540px;
   height: 480px;
 }
-// .imageWrapper {
-//   display: inline-block;
-//   max-width: 80vw;
-// }
 
 .imageWrapper img {
   max-width: 80vw;
@@ -94,8 +100,8 @@
   cursor: pointer;
 
   @media (max-width: 480px) {
-    top: initial;
-    bottom: calc(var(--spacing-xl) * 2);
+    // top: initial;
+    // bottom: calc(var(--spacing-xl) * 2);
     background: rgba(0,0,0,0.8);
     border: 1px solid var(--primary-color);
   }
@@ -103,14 +109,14 @@
 .prev { 
   left: var(--spacing-xl);
   @media (max-width: 480px) {
-    left: calc(var(--spacing-xl) * 3);
+    left: var(--spacing-m);
   }
 }
 
 .next { 
   right: var(--spacing-xl);
   @media (max-width: 480px) {
-    right: calc(var(--spacing-xl) * 3)
+    right: var(--spacing-m)
   }
 }
 

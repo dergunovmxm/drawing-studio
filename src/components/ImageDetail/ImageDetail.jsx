@@ -59,6 +59,8 @@ const ImageDetail = ({ open, onClose, images = [], index = 0, onChangeIndex }) =
                 glassBorderColor="#000000cc"
                 glassBorderWidth={2}
               />
+
+              <img className={styles.mobileImage} src={image.link} alt='image' />
           </div>
 
           <button className={styles.close} aria-label="Close" onClick={onClose}>×</button>
