@@ -1,0 +1,76 @@
+.root {
+  height: var(--header-height);
+  box-sizing: border-box;
+  padding: var(--spacing-xl);
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  position: absolute;
+}
+
+.root_with_bg {
+  height: var(--header-height);
+  box-sizing: border-box;
+  padding: var(--spacing-xl);
+  color: var(--primary-color);
+  position: fixed;
+  z-index: 10;
+}
+
+.navs {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.li {
+  margin: 0 8spx;
+  cursor: pointer;
+}
+
+.navLink {
+  position: relative;
+}
+
+.burger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.burgerLine {
+  width: 25px;
+  height: 3px;
+  background-color: var(--primary-color);
+  border-radius: 2px;
+}
+
+@media (max-width: 624px) {
+  .navs {
+    display: none;
+    flex-direction: column;
+    background-color: white; /* или нужный цвет */
+    position: fixed;
+    top: var(--header-height);
+    right: 0;
+    width: 200px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    height: calc(100vh - var(--header-height));
+    overflow-y: auto;
+    z-index: 100;
+  }
+  
+  .navs_mobile_open {
+    display: flex;
+  }
+  
+  .burger {
+    display: flex;
+  }
+}
