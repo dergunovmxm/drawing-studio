@@ -10,7 +10,12 @@ const ImageDetail = ({ open, onClose, images = [], index = 0, onChangeIndex }) =
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
   const [showSwipeHint, setShowSwipeHint] = useState(false);
+  const [scale, setScale] = useState(1);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isZoomed, setIsZoomed] = useState(false);
   const contentRef = useRef(null);
+  const imageRef = useRef(null);
+  const lastTouchDistance = useRef(0);
 
   // Минимальное расстояние свайпа
   const minSwipeDistance = 50;
@@ -31,18 +36,29 @@ const ImageDetail = ({ open, onClose, images = [], index = 0, onChangeIndex }) =
     goTo(validIndex - 1);
   }, [images.length, validIndex, goTo]);
 
-  // Обработчики свайпа
+  // Сброс зума при смене картинки
+  useEffect(() => {
+    setScale(1);
+    setPosition({ x: 0, y: 0 });
+    setIsZoomed(false);
+  }, [validIndex]);
+
+  // Обработчики свайпа для навигации
   const onTouchStart = (e) => {
+    if (isZoomed) return; // Если увеличено, не обрабатываем навигацию
+    
     setTouchEnd(null);
     setTouchStart(e.targetTouches[0].clientX);
   };
 
   const onTouchMove = (e) => {
+    if (isZoomed) return; // Если увеличено, не обрабатываем навигацию
+    
     setTouchEnd(e.targetTouches[0].clientX);
   };
 
   const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
+    if (isZoomed || !touchStart || !touchEnd) return;
     
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > minSwipeDistance;
@@ -55,11 +71,88 @@ const ImageDetail = ({ open, onClose, images = [], index = 0, onChangeIndex }) =
     }
   };
 
+  // Обработчики для масштабирования
+  const handleTouchStartZoom = (e) => {
+    if (e.touches.length === 2) {
+      // Начало жеста масштабирования
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      lastTouchDistance.current = Math.hypot(
+        touch1.clientX - touch2.clientX,
+        touch1.clientY - touch2.clientY
+      );
+    }
+  };
+
+  const handleTouchMoveZoom = (e) => {
+    if (e.touches.length === 2) {
+      // Жест масштабирования
+      e.preventDefault();
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const currentDistance = Math.hypot(
+        touch1.clientX - touch2.clientX,
+        touch1.clientY - touch2.clientY
+      );
+
+      if (lastTouchDistance.current > 0) {
+        const newScale = Math.max(1, Math.min(3, scale * (currentDistance / lastTouchDistance.current)));
+        setScale(newScale);
+        setIsZoomed(newScale > 1);
+      }
+
+      lastTouchDistance.current = currentDistance;
+    } else if (isZoomed && e.touches.length === 1) {
+      // Перемещение увеличенного изображения
+      e.preventDefault();
+      const touch = e.touches[0];
+      setPosition(prev => ({
+        x: touch.clientX - (touch.target.offsetWidth * scale) / 2,
+        y: touch.clientY - (touch.target.offsetHeight * scale) / 2
+      }));
+    }
+  };
+
+  const handleTouchEndZoom = () => {
+    lastTouchDistance.current = 0;
+  };
+
+  // Двойное нажатие для зума
+  const handleDoubleTap = (e) => {
+    if (scale === 1) {
+      setScale(2);
+      setIsZoomed(true);
+    } else {
+      setScale(1);
+      setPosition({ x: 0, y: 0 });
+      setIsZoomed(false);
+    }
+  };
+
+  // Сброс зума при клике на backdrop
+  const handleBackdropClick = (e) => {
+    if (isZoomed) {
+      setScale(1);
+      setPosition({ x: 0, y: 0 });
+      setIsZoomed(false);
+    } else {
+      onClose?.();
+    }
+  };
+
   useEffect(() => {
     if (!open) return;
     
     const onKey = (e) => {
-      if (e.key === 'Escape') return onClose?.();
+      if (e.key === 'Escape') {
+        if (isZoomed) {
+          setScale(1);
+          setPosition({ x: 0, y: 0 });
+          setIsZoomed(false);
+        } else {
+          onClose?.();
+        }
+      }
       if (e.key === 'ArrowRight') return onNext();
       if (e.key === 'ArrowLeft') return onPrev();
     };
@@ -94,7 +187,7 @@ const ImageDetail = ({ open, onClose, images = [], index = 0, onChangeIndex }) =
       document.removeEventListener('keydown', onKey);
       document.body.style.overflow = prevOverflow;
     };
-  }, [open, onClose, onNext, onPrev, images.length]);
+  }, [open, onClose, onNext, onPrev, images.length, isZoomed]);
 
   // Очищаем localStorage при закрытии компонента
   useEffect(() => {
@@ -110,46 +203,62 @@ const ImageDetail = ({ open, onClose, images = [], index = 0, onChangeIndex }) =
 
   return (
     <Portal>
-      <div className={styles.backdrop} onMouseDown={onClose} role="dialog" aria-modal="true">
-      <button className={styles.close} aria-label="Close" onClick={onClose}>×</button>
+      <div 
+        className={styles.backdrop} 
+        onMouseDown={handleBackdropClick} 
+        role="dialog" 
+        aria-modal="true"
+      >
+        <button className={styles.close} aria-label="Close" onClick={onClose}>×</button>
 
         <div 
           className={styles.content} 
           onMouseDown={(e) => e.stopPropagation()}
           ref={contentRef}
-          // Добавляем обработчики свайпа только для мобильных устройств
-          {...(isMobile && {
-            onTouchStart,
-            onTouchMove,
-            onTouchEnd
-          })}
         >     
-
           <div className={styles.imageWrapper}>
-            <Magnifier 
-              key={image.link}
-              imageUrl={image.link}
-              largeImageUrl={image.link}
-              zoomFactor={2}
-              glassDimension={250}
-              glassBorderColor="#000000cc"
-              glassBorderWidth={2}
-            />
-            <img 
-              className={styles.mobileImage} 
-              src={image.link} 
-              alt='image'
-              // Добавляем обработчики свайпа для мобильного изображения
-              {...(isMobile && {
-                onTouchStart,
-                onTouchMove,
-                onTouchEnd
-              })}
-            />
+            {/* Для десктопа используем Magnifier */}
+            {!isMobile && (
+              <Magnifier 
+                key={image.link}
+                imageUrl={image.link}
+                largeImageUrl={image.link}
+                zoomFactor={2}
+                glassDimension={250}
+                glassBorderColor="#000000cc"
+                glassBorderWidth={2}
+              />
+            )}
+            
+            {/* Для мобильных - кастомное увеличение */}
+            {isMobile && (
+              <img 
+                ref={imageRef}
+                className={`${styles.mobileImage} ${isZoomed ? styles.zoomed : ''}`}
+                src={image.link} 
+                alt='image'
+                style={{
+                  transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
+                  transformOrigin: 'center center',
+                  transition: isZoomed ? 'none' : 'transform 0.3s ease'
+                }}
+                // Обработчики для навигации (только когда не увеличено)
+                {...(!isZoomed && {
+                  onTouchStart,
+                  onTouchMove,
+                  onTouchEnd
+                })}
+                // Обработчики для масштабирования
+                onTouchStart={handleTouchStartZoom}
+                onTouchMove={handleTouchMoveZoom}
+                onTouchEnd={handleTouchEndZoom}
+                onDoubleClick={handleDoubleTap}
+              />
+            )}
           </div>
 
           {/* Подсказка о свайпе */}
-          {isMobile && images.length > 1 && showSwipeHint && (
+          {isMobile && images.length > 1 && showSwipeHint && !isZoomed && (
             <div className={styles.swipeHint}>
               <div className={styles.swipeArrows}>
                 <span className={styles.arrowRight}>›››</span>
@@ -157,6 +266,21 @@ const ImageDetail = ({ open, onClose, images = [], index = 0, onChangeIndex }) =
               <Typography 
                 name='caption3' 
                 text="Свайп для просмотра картинок" 
+              />
+              <Typography 
+                name='caption6' 
+                text="Двойное нажатие для увеличения" 
+                className={styles.zoomHint}
+              />
+            </div>
+          )}
+
+          {/* Подсказка при зуме */}
+          {isMobile && isZoomed && (
+            <div className={styles.zoomHintActive}>
+              <Typography 
+                name='caption6' 
+                text="Коснитесь экрана чтобы выйти из режима увеличения" 
               />
             </div>
           )}

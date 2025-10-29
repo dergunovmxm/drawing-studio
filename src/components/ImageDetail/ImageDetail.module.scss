@@ -43,9 +43,16 @@
   display: none;
   @media (max-width: 480px) {
     display: block;
-    // Добавляем поддержку свайпа для мобильного изображения
-    touch-action: pan-y;
-    user-select: none;
+    max-width: 80vw;
+    max-height: 80vh;
+    object-fit: contain;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    
+    &.zoomed {
+      cursor: move;
+      touch-action: none;
+    }
   }
 }
 
@@ -147,7 +154,8 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  z-index: 10;
+  z-index: 100;
+  pointer-events: none;
   
   @media (min-width: 481px) {
     display: none;
