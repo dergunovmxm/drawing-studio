@@ -43,16 +43,9 @@
   display: none;
   @media (max-width: 480px) {
     display: block;
-    max-width: 80vw;
-    max-height: 80vh;
-    object-fit: contain;
-    cursor: pointer;
-    transition: transform 0.3s ease;
-    
-    &.zoomed {
-      cursor: move;
-      touch-action: none;
-    }
+    // Добавляем поддержку свайпа для мобильного изображения
+    touch-action: pan-y;
+    user-select: none;
   }
 }
 
