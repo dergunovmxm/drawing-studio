@@ -14,7 +14,6 @@ const ImageDetail = ({ open, onClose, images = [], index = 0, onChangeIndex }) =
   const minSwipeDistance = 50;
   const isMobile = typeof window !== 'undefined' && window.innerWidth <= 480;
 
-
   const goTo = useCallback((newIndex) => {
     if (!onChangeIndex) return;
     const wrapped = ((newIndex % images.length) + images.length) % images.length;
