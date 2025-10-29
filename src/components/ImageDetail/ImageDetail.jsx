@@ -35,8 +35,6 @@ const ImageDetail = ({ open, onClose, images = [], index = 0, onChangeIndex }) =
   const onTouchStart = (e) => {
     setTouchEnd(null);
     setTouchStart(e.targetTouches[0].clientX);
-    // Скрываем подсказку при начале свайпа
-    setShowSwipeHint(false);
   };
 
   const onTouchMove = (e) => {
@@ -73,16 +71,23 @@ const ImageDetail = ({ open, onClose, images = [], index = 0, onChangeIndex }) =
     // Показываем подсказку только на мобильных устройствах
     const isMobile = typeof window !== 'undefined' && window.innerWidth <= 480;
     if (isMobile && images.length > 1) {
-      setShowSwipeHint(true);
-      // Автоматически скрываем подсказку через 3 секунды
-      const timer = setTimeout(() => {
-        setShowSwipeHint(false);
-      }, 3000);
-      return () => {
-        document.removeEventListener('keydown', onKey);
-        document.body.style.overflow = prevOverflow;
-        clearTimeout(timer);
-      };
+      // Проверяем, не показывали ли уже подсказку
+      const hasSeenHint = localStorage.getItem('imageDetailSwipeHintSeen') === 'true';
+      if (!hasSeenHint) {
+        setShowSwipeHint(true);
+        // Сохраняем, что подсказка была показана
+        localStorage.setItem('imageDetailSwipeHintSeen', 'true');
+        // Автоматически скрываем подсказку через 3 секунды
+        const timer = setTimeout(() => {
+          setShowSwipeHint(false);
+        }, 3000);
+        
+        return () => {
+          document.removeEventListener('keydown', onKey);
+          document.body.style.overflow = prevOverflow;
+          clearTimeout(timer);
+        };
+      }
     }
     
     return () => {
@@ -90,6 +95,14 @@ const ImageDetail = ({ open, onClose, images = [], index = 0, onChangeIndex }) =
       document.body.style.overflow = prevOverflow;
     };
   }, [open, onClose, onNext, onPrev, images.length]);
+
+  // Очищаем localStorage при закрытии компонента
+  useEffect(() => {
+    if (!open) {
+      // Удаляем флаг просмотра подсказки при закрытии
+      localStorage.removeItem('imageDetailSwipeHintSeen');
+    }
+  }, [open]);
 
   if (!open || !image) return null;
 
@@ -147,7 +160,6 @@ const ImageDetail = ({ open, onClose, images = [], index = 0, onChangeIndex }) =
               />
             </div>
           )}
-
 
           {/* Показываем кнопки навигации только на десктопе */}
           {!isMobile && (
