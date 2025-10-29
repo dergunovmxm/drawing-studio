@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState, useRef } from 'react';
 import Portal from '../ui/Portal';
 import styles from './ImageDetail.module.scss';
 import Magnifier from "react-glass-magnifier";
@@ -7,6 +7,13 @@ import Typography from '../ui';
 const ImageDetail = ({ open, onClose, images = [], index = 0, onChangeIndex }) => {
   const validIndex = Math.max(0, Math.min(index, images.length - 1));
   const image = images[validIndex];
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+  const contentRef = useRef(null);
+
+  const minSwipeDistance = 50;
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 480;
+
 
   const goTo = useCallback((newIndex) => {
     if (!onChangeIndex) return;
@@ -24,7 +31,29 @@ const ImageDetail = ({ open, onClose, images = [], index = 0, onChangeIndex }) =
     goTo(validIndex - 1);
   }, [images.length, validIndex, goTo]);
 
- 
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      onNext();
+    } else if (isRightSwipe) {
+      onPrev();
+    }
+  };
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e) => {
@@ -41,14 +70,22 @@ const ImageDetail = ({ open, onClose, images = [], index = 0, onChangeIndex }) =
     };
   }, [open, onClose, onNext, onPrev]);
 
+
   if (!open || !image) return null;
 
   return (
     <Portal>
       <div className={styles.backdrop} onMouseDown={onClose} role="dialog" aria-modal="true">
          
-        <div className={styles.content} onMouseDown={(e) => e.stopPropagation()}>     
-          
+        <div className={styles.content} 
+             onMouseDown={(e) => e.stopPropagation()} 
+             ref={contentRef} 
+             {...(isMobile && {
+              onTouchStart,
+              onTouchMove,
+              onTouchEnd
+            })}
+          >     
           <div className={styles.imageWrapper}>
               <Magnifier 
                 key={image.link}
@@ -65,19 +102,23 @@ const ImageDetail = ({ open, onClose, images = [], index = 0, onChangeIndex }) =
 
           <button className={styles.close} aria-label="Close" onClick={onClose}>×</button>
 
-          <button
-            className={styles.prev}
-            aria-label="Previous"
-            onClick={onPrev}
-            type="button"
-          >‹</button>
+            {!isMobile && (
+              <>
+                <button
+                  className={styles.prev}
+                  aria-label="Previous"
+                  onClick={onPrev}
+                  type="button"
+                >‹</button>
 
-          <button
-            className={styles.next}
-            aria-label="Next"
-            onClick={onNext}
-            type="button"
-          >›</button>
+                <button
+                  className={styles.next}
+                  aria-label="Next"
+                  onClick={onNext}
+                  type="button"
+                >›</button>
+              </>
+          )}
 
           {image.title && (
             <div className={styles.caption}>

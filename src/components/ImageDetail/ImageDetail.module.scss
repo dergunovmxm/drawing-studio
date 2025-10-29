@@ -7,6 +7,11 @@
   justify-content: center;
   align-items: center;
   z-index: 10;
+  
+  // Добавляем поддержку свайпа на весь бэкдроп для мобильных
+  @media (max-width: 480px) {
+    touch-action: pan-y;
+  }
 }
 
 .content {
@@ -14,7 +19,12 @@
   max-width: 80vw;
   display: inline-flex;
   flex-direction: column;
-
+  
+  // Добавляем поддержку свайпа для контента на мобильных
+  @media (max-width: 480px) {
+    touch-action: pan-y;
+    user-select: none;
+  }
 }
 
 .imageWrapper div {
@@ -32,6 +42,9 @@
   display: none;
   @media (max-width: 480px) {
     display: block;
+    // Добавляем поддержку свайпа для мобильного изображения
+    touch-action: pan-y;
+    user-select: none;
   }
 }
 
@@ -54,6 +67,7 @@
   height: 100vh;
   z-index: 100;
 }
+
 .close {
   position: absolute;
   top: var(--spacing-m);
@@ -66,9 +80,9 @@
   height: 44px;
   font-size: 28px;
   cursor: pointer;
+  z-index: 11; // Убедимся, что кнопка поверх всего
 
   @media (max-width: 480px) {
-
     background: rgba(0,0,0,0.8);
     border: 1px solid var(--primary-color);
   }
@@ -86,6 +100,7 @@
   }
 }
 
+// Скрываем кнопки навигации на мобильных
 .prev, .next {
   position: absolute;
   top: 50%;
@@ -98,14 +113,13 @@
   border-radius: 50%;
   font-size: 20px;
   cursor: pointer;
+  z-index: 11; // Убедимся, что кнопки поверх всего
 
   @media (max-width: 480px) {
-    // top: initial;
-    // bottom: calc(var(--spacing-xl) * 2);
-    background: rgba(0,0,0,0.8);
-    border: 1px solid var(--primary-color);
+    display: none; // Скрываем на мобильных
   }
 }
+
 .prev { 
   left: var(--spacing-xl);
   @media (max-width: 480px) {
@@ -119,7 +133,3 @@
     right: var(--spacing-m)
   }
 }
-
-
-
-
