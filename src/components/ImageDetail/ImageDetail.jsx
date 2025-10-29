@@ -9,10 +9,11 @@ const ImageDetail = ({ open, onClose, images = [], index = 0, onChangeIndex }) =
   const image = images[validIndex];
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
+  const [showSwipeHint, setShowSwipeHint] = useState(false);
   const contentRef = useRef(null);
 
+  // Минимальное расстояние свайпа
   const minSwipeDistance = 50;
-  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 480;
 
   const goTo = useCallback((newIndex) => {
     if (!onChangeIndex) return;
@@ -30,9 +31,12 @@ const ImageDetail = ({ open, onClose, images = [], index = 0, onChangeIndex }) =
     goTo(validIndex - 1);
   }, [images.length, validIndex, goTo]);
 
+  // Обработчики свайпа
   const onTouchStart = (e) => {
     setTouchEnd(null);
     setTouchStart(e.targetTouches[0].clientX);
+    // Скрываем подсказку при начале свайпа
+    setShowSwipeHint(false);
   };
 
   const onTouchMove = (e) => {
@@ -55,68 +59,113 @@ const ImageDetail = ({ open, onClose, images = [], index = 0, onChangeIndex }) =
 
   useEffect(() => {
     if (!open) return;
+    
     const onKey = (e) => {
       if (e.key === 'Escape') return onClose?.();
       if (e.key === 'ArrowRight') return onNext();
       if (e.key === 'ArrowLeft') return onPrev();
     };
+    
     document.addEventListener('keydown', onKey);
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+
+    // Показываем подсказку только на мобильных устройствах
+    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 480;
+    if (isMobile && images.length > 1) {
+      setShowSwipeHint(true);
+      // Автоматически скрываем подсказку через 3 секунды
+      const timer = setTimeout(() => {
+        setShowSwipeHint(false);
+      }, 3000);
+      return () => {
+        document.removeEventListener('keydown', onKey);
+        document.body.style.overflow = prevOverflow;
+        clearTimeout(timer);
+      };
+    }
+    
     return () => {
       document.removeEventListener('keydown', onKey);
       document.body.style.overflow = prevOverflow;
     };
-  }, [open, onClose, onNext, onPrev]);
-
+  }, [open, onClose, onNext, onPrev, images.length]);
 
   if (!open || !image) return null;
+
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 480;
 
   return (
     <Portal>
       <div className={styles.backdrop} onMouseDown={onClose} role="dialog" aria-modal="true">
-         
-        <div className={styles.content} 
-             onMouseDown={(e) => e.stopPropagation()} 
-             ref={contentRef} 
-             {...(isMobile && {
-              onTouchStart,
-              onTouchMove,
-              onTouchEnd
-            })}
-          >     
-          <div className={styles.imageWrapper}>
-              <Magnifier 
-                key={image.link}
-                imageUrl={image.link}
-                largeImageUrl={image.link}
-                zoomFactor={2}
-                glassDimension={250}
-                glassBorderColor="#000000cc"
-                glassBorderWidth={2}
-              />
+      <button className={styles.close} aria-label="Close" onClick={onClose}>×</button>
 
-              <img className={styles.mobileImage} src={image.link} alt='image' />
+        <div 
+          className={styles.content} 
+          onMouseDown={(e) => e.stopPropagation()}
+          ref={contentRef}
+          // Добавляем обработчики свайпа только для мобильных устройств
+          {...(isMobile && {
+            onTouchStart,
+            onTouchMove,
+            onTouchEnd
+          })}
+        >     
+
+          <div className={styles.imageWrapper}>
+            <Magnifier 
+              key={image.link}
+              imageUrl={image.link}
+              largeImageUrl={image.link}
+              zoomFactor={2}
+              glassDimension={250}
+              glassBorderColor="#000000cc"
+              glassBorderWidth={2}
+            />
+            <img 
+              className={styles.mobileImage} 
+              src={image.link} 
+              alt='image'
+              // Добавляем обработчики свайпа для мобильного изображения
+              {...(isMobile && {
+                onTouchStart,
+                onTouchMove,
+                onTouchEnd
+              })}
+            />
           </div>
 
-          <button className={styles.close} aria-label="Close" onClick={onClose}>×</button>
+          {/* Подсказка о свайпе */}
+          {isMobile && images.length > 1 && showSwipeHint && (
+            <div className={styles.swipeHint}>
+              <div className={styles.swipeArrows}>
+                <span className={styles.arrowRight}>›››</span>
+              </div>
+              <Typography 
+                name='caption3' 
+                text="Свайп для просмотра картинок" 
+              />
+            </div>
+          )}
 
-            {!isMobile && (
-              <>
-                <button
-                  className={styles.prev}
-                  aria-label="Previous"
-                  onClick={onPrev}
-                  type="button"
-                >‹</button>
 
-                <button
-                  className={styles.next}
-                  aria-label="Next"
-                  onClick={onNext}
-                  type="button"
-                >›</button>
-              </>
+          {/* Показываем кнопки навигации только на десктопе */}
+          {!isMobile && (
+            <>
+              <button
+                className={styles.prev}
+                aria-label="Previous"
+                onClick={onPrev}
+                type="button"
+              >‹</button>
+
+              <button
+                className={styles.next}
+                aria-label="Next"
+                onClick={onNext}
+                type="button"
+              >›</button>
+            </>
           )}
 
           {image.title && (
@@ -124,7 +173,6 @@ const ImageDetail = ({ open, onClose, images = [], index = 0, onChangeIndex }) =
               {image.title && <Typography className={styles.title} name='caption6' text={image.title} />}
             </div>
           )}
-
         </div>
       </div>
     </Portal>
