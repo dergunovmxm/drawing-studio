@@ -4,7 +4,7 @@ import App from './App.jsx'
 import {
   RouterProvider,
 } from "react-router";
-import router from './router/routes.js'
+import router from './router/routes.jsx'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 const queryClient = new QueryClient()
