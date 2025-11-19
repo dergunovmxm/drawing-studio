@@ -1,0 +1,18 @@
+.root{
+  padding: var(--header-height) calc(var(--spacing-l) * 2);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  @media (max-width: 480px) {
+    padding: var(--header-height) var(--spacing-xl);
+  }
+}
+
+.svg {
+  svg {
+    height: 180px;
+    width: 180px;
+  }
+}

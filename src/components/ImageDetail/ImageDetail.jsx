@@ -1,8 +1,10 @@
-import React, { useEffect, useCallback, useState, useRef } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import Portal from '../ui/Portal';
 import styles from './ImageDetail.module.scss';
 import Magnifier from "react-glass-magnifier";
 import Typography from '../ui';
+import { useState } from 'react';
+import { useRef } from 'react';
 
 const ImageDetail = ({ open, onClose, images = [], index = 0, onChangeIndex }) => {
   const validIndex = Math.max(0, Math.min(index, images.length - 1));
@@ -14,6 +16,7 @@ const ImageDetail = ({ open, onClose, images = [], index = 0, onChangeIndex }) =
 
   // Минимальное расстояние свайпа
   const minSwipeDistance = 50;
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 480;
 
   const goTo = useCallback((newIndex) => {
     if (!onChangeIndex) return;
@@ -106,64 +109,57 @@ const ImageDetail = ({ open, onClose, images = [], index = 0, onChangeIndex }) =
 
   if (!open || !image) return null;
 
-  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 480;
 
   return (
     <Portal>
       <div className={styles.backdrop} onMouseDown={onClose} role="dialog" aria-modal="true">
-      <button className={styles.close} aria-label="Close" onClick={onClose}>×</button>
-
-        <div 
-          className={styles.content} 
-          onMouseDown={(e) => e.stopPropagation()}
-          ref={contentRef}
+        <button className={styles.close} aria-label="Close" onClick={onClose}>×</button>
+        <div className={styles.content} onMouseDown={(e) => e.stopPropagation()}  ref={contentRef}
           // Добавляем обработчики свайпа только для мобильных устройств
           {...(isMobile && {
             onTouchStart,
             onTouchMove,
             onTouchEnd
-          })}
-        >     
-
+          })}>     
+          
           <div className={styles.imageWrapper}>
-            <Magnifier 
-              key={image.link}
-              imageUrl={image.link}
-              largeImageUrl={image.link}
-              zoomFactor={2}
-              glassDimension={250}
-              glassBorderColor="#000000cc"
-              glassBorderWidth={2}
-            />
-            <img 
-              className={styles.mobileImage} 
-              src={image.link} 
-              alt='image'
+              <Magnifier 
+                key={image.link}
+                imageUrl={image.link}
+                largeImageUrl={image.link}
+                zoomFactor={2}
+                glassDimension={250}
+                glassBorderColor="#000000cc"
+                glassBorderWidth={2}
+              />
+
+              <img className={styles.mobileImage} src={image.link} alt='image' 
               // Добавляем обработчики свайпа для мобильного изображения
               {...(isMobile && {
                 onTouchStart,
                 onTouchMove,
                 onTouchEnd
-              })}
-            />
+              })}/>
           </div>
 
-          {/* Подсказка о свайпе */}
-          {isMobile && images.length > 1 && showSwipeHint && (
+            {/* Подсказка о свайпе */}
+            {isMobile && images.length > 1 && showSwipeHint && (
             <div className={styles.swipeHint}>
               <div className={styles.swipeArrows}>
+                <span className={styles.arrowLeft}>‹‹‹</span>
                 <span className={styles.arrowRight}>›››</span>
               </div>
               <Typography 
                 name='caption3' 
-                text="Свайп для просмотра картинок" 
+                text="Свайп для переключения картинок" 
               />
             </div>
           )}
 
-          {/* Показываем кнопки навигации только на десктопе */}
-          {!isMobile && (
-            <>
+          
+          {
+            !isMobile ? (
+              <>
               <button
                 className={styles.prev}
                 aria-label="Previous"
@@ -177,14 +173,17 @@ const ImageDetail = ({ open, onClose, images = [], index = 0, onChangeIndex }) =
                 onClick={onNext}
                 type="button"
               >›</button>
-            </>
-          )}
+              </>
+            ) : null
+          }
+          
 
           {image.title && (
             <div className={styles.caption}>
               {image.title && <Typography className={styles.title} name='caption6' text={image.title} />}
             </div>
           )}
+
         </div>
       </div>
     </Portal>

@@ -7,8 +7,7 @@
   justify-content: center;
   align-items: center;
   z-index: 10;
-  
-  // Добавляем поддержку свайпа на весь бэкдроп для мобильных
+
   @media (max-width: 480px) {
     touch-action: pan-y;
   }
@@ -19,13 +18,7 @@
   max-width: 80vw;
   display: inline-flex;
   flex-direction: column;
-  position: relative;
   
-  // Добавляем поддержку свайпа для контента на мобильных
-  @media (max-width: 480px) {
-    touch-action: pan-y;
-    user-select: none;
-  }
 }
 
 .imageWrapper div {
@@ -43,9 +36,7 @@
   display: none;
   @media (max-width: 480px) {
     display: block;
-    // Добавляем поддержку свайпа для мобильного изображения
     touch-action: pan-y;
-    user-select: none;
   }
 }
 
@@ -57,7 +48,7 @@
 .imageWrapper img {
   max-width: 80vw;
   max-height: 80vh;
-  object-fit: contain;
+  object-fit: cover;
   cursor: crosshair;
 }
 
@@ -68,7 +59,6 @@
   height: 100vh;
   z-index: 100;
 }
-
 .close {
   position: absolute;
   top: var(--spacing-m);
@@ -81,7 +71,7 @@
   height: 44px;
   font-size: 28px;
   cursor: pointer;
-  z-index: 11; // Убедимся, что кнопка поверх всего
+  z-index: 11;
 
   @media (max-width: 480px) {
     background: rgba(0,0,0,0.8);
@@ -101,7 +91,6 @@
   }
 }
 
-// Скрываем кнопки навигации на мобильных
 .prev, .next {
   position: absolute;
   top: 50%;
@@ -114,13 +103,12 @@
   border-radius: 50%;
   font-size: 20px;
   cursor: pointer;
-  z-index: 11; // Убедимся, что кнопки поверх всего
 
   @media (max-width: 480px) {
-    display: none; // Скрываем на мобильных
+    background: rgba(0,0,0,0.8);
+    border: 1px solid var(--primary-color);
   }
 }
-
 .prev { 
   left: var(--spacing-xl);
   @media (max-width: 480px) {
@@ -162,25 +150,32 @@
   animation: swipeAnimation 2s ease-in-out infinite;
 }
 
-.arrowRight {
+.arrowLeft, .arrowRight {
   font-size: 48px;
   color: var(--primary-color);
   font-weight: bold;
   opacity: 0.8;
+}
+
+.arrowLeft {
+  margin-right: 12px;
+}
+
+.arrowRight {
   margin-left: 12px;
 }
 
 @keyframes swipeAnimation {
   0% {
-    transform: translateX(-15px);
+    transform: translateX(-10px);
     opacity: 0.6;
   }
   50% {
-    transform: translateX(15px);
+    transform: translateX(10px);
     opacity: 1;
   }
   100% {
-    transform: translateX(-15px);
+    transform: translateX(-10px);
     opacity: 0.6;
   }
 }

@@ -7,6 +7,7 @@ const Main = lazy(() => import("../pages/Main"));
 const Gallery = lazy(() => import("../pages/Gallery"));
 const GallerySection = lazy(() => import("../pages/Gallery/GallerySection"));
 const Contacts = lazy(() => import("../pages/Contacts"));
+const NotFound = lazy(() => import("../pages/NotFound"));
 
 const router = createBrowserRouter([
   {
@@ -18,6 +19,7 @@ const router = createBrowserRouter([
       { path: "gallery", Component: Gallery },
       { path: "gallery/:alias", Component: GallerySection },
       { path: "contacts", Component: Contacts },
+      { path: "*", Component: NotFound },
     ],
   },
 ]);
