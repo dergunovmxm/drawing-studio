@@ -5,13 +5,12 @@ export const useFetchImage = () => {
   const {
     data: items,
     isLoading,
-    isFetching,
-    isPending,
     error,
   } = useQuery({
     queryKey: ["gallery"],
     queryFn: fetchGallery,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 30,
+    gcTime: 1000 * 60 * 60,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
@@ -19,8 +18,6 @@ export const useFetchImage = () => {
   return {
     data: items,
     isLoading,
-    isFetching,
-    isPending,
     error,
   };
 };

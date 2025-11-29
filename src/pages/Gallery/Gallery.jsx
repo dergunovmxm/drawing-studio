@@ -14,11 +14,12 @@ import Error from '../../components/ui/Error'
 const Gallery = () => {
  
   const navigate = useNavigate()
-  const {data, isLoading, isFetching, isPending, error} = useFetchImage()
+  const {data, isLoading, error} = useFetchImage()
+  console.log('data Gallery', data)
 
   const {grouped} = useGroupImage(data ?? [])
   const placeholderAliases = ["section-1", "section-2", "section-3"]
-  const shouldShowSkeleton = isLoading || isFetching || isPending || (Array.isArray(data) && data.length === 0)
+  const shouldShowSkeleton = isLoading  || (Array.isArray(data) && data.length === 0)
   if (error) return <Error error={error.message}/>
   return (
     <main className={styles.root}>

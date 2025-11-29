@@ -10,7 +10,7 @@ export const useGroupImage = (items) => {
     life: "Натюрморты",
     experiments: "Эксперименты",
   };
-
+  console.log("useGroupImage", items);
   const grouped = useMemo(() => {
     const map = new Map();
 
